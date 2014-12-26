@@ -6,7 +6,7 @@ from backend import get_cache_backend
 
 cache = get_cache_backend()
 
-def make_key(key, constructor = md5):
+def make_key(key, constructor=md5):
     return constructor(str(key)).hexdigest()
 
 

@@ -1,19 +1,24 @@
-from settings import Settings
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+class GenericCacheBackend(object):
 
-settings = Settings()
+    def get(self, *args, **kwargs):
+        pass
 
-class MemcacheBackend:
-    
-    def __init__(self, *args, **kwargs):
+    def set(self, *args, **kwargs):
+        pass
+
+    def get_many(self, *args, **kwargs):
+        pass
+
+    def set_many(self, *args, **kwargs):
         pass
 
 
-def get_cache_backend():
-    return {'memcache':MemcacheBackend,
-            'mock': None, 
-            }[settings.backend](settings)
-        
+class MemcachedBackend(GenericCacheBackend):
+    pass
 
-
+class DjangoBackend(GenericCacheBackend):
+    pass
 
