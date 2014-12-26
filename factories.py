@@ -11,7 +11,7 @@
 """
 
 import functools
-from .tools import make_key, make_group_value
+from tools import make_key, make_group_value
 
 def cached_factory(client):
     return cached(client)
