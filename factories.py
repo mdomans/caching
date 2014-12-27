@@ -58,6 +58,7 @@ class CacheDecorator(object):
 
     def __init__(self, cache_client):
         self.cache = cache_client
+        self.key = ''
 
     def expire_key(self, key):
         self.cache.set(make_key(key), None)
@@ -89,8 +90,6 @@ class CacheDecorator(object):
                 evaluate = True
 
         if evaluate:
-            # print 'cache miss %s' % func,args, kwargs
-
             value = func(*args, **kwargs)
             if not group_keys:
                 cache.set(key, value)

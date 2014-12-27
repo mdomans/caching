@@ -86,6 +86,16 @@ class TestMemcacheClient(unittest.TestCase):
 
         cache.expire_key("test_params")
 
+    def test_sample_usage(self):
+
+        cache = self.cache_decorator
+
+        @cache("user_data_main_key", group_keys=['user_data_1', 'users_under_test'])
+        def func_under_test(arg):
+            return arg
+
+        self.assertEqual(func_under_test(1), 1)
+
 
 class TestUMemcacheClient(unittest.TestCase):
 
