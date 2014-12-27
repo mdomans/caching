@@ -1,7 +1,5 @@
 # Caching
-``
-https://travis-ci.org/mdomans/caching.svg?branch=master
-
+[![Build Status](https://travis-ci.org/mdomans/caching.svg?branch=master)](https://travis-ci.org/mdomans/caching)
 ## Installation and Dependencies
 
 You can install caching with `python setup.py install` or `easy_install caching` 
