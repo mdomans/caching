@@ -50,7 +50,9 @@ class CacheDecorator(object):
                     self.group_keys.append(group_key)
                 result = self.run_decorated(fn, *args, **kwargs)
                 return result
+
             return decorates_args
+
         return decorate_func
 
 
@@ -67,14 +69,14 @@ class CacheDecorator(object):
         value = None
         evaluate = False
         if group_keys:
-            data = cache.get_many(group_keys + [key])
+            data = cache.get_multi(group_keys + [key])
             data_dict = data.get(key)
             if (not data) or (not data_dict):
                 evaluate = True
             if data_dict:
                 value = data_dict['value']
                 for group_key in group_keys:
-                    if not group_key in data or not group_key in data_dict or data[group_key] != data_dict[group_key]:
+                    if group_key not in data or group_key not in data_dict or data[group_key] != data_dict[group_key]:
                         evaluate = True
                     if group_key in data and not data[group_key]:
                         del data[group_key]
@@ -83,9 +85,11 @@ class CacheDecorator(object):
             value = cache.get(key)
             if not value:
                 evaluate = True
+            if isinstance(value, dict) and 'is_multigroup' in value:
+                evaluate = True
 
         if evaluate:
-            #            print 'cache miss %s' % func,args, kwargs
+            # print 'cache miss %s' % func,args, kwargs
 
             value = func(*args, **kwargs)
             if not group_keys:
@@ -99,9 +103,10 @@ class CacheDecorator(object):
                         group_dict[group_key] = data[group_key]
                 data_dict = {}
                 data_dict['value'] = value
+                data_dict['is_multigroup'] = True
                 data_dict.update(group_dict)
                 group_dict[key] = data_dict
-                cache.set_many(group_dict)
+                cache.set_multi(group_dict)
         return value
 
 
