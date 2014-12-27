@@ -1,4 +1,6 @@
 # Caching
+``
+https://travis-ci.org/mdomans/caching.svg?branch=master
 
 ## Installation and Dependencies
 
