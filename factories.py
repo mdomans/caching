@@ -13,10 +13,8 @@
 import functools
 from tools import make_key, make_group_value
 
-def cached_factory(client):
-    return cached(client)
 
-class cached(object):
+class CacheDecorator(object):
     """
 
     Decorator for work with multiple groups for each key
@@ -42,23 +40,30 @@ class cached(object):
     """
     group_keys = []
 
-    def __call__(self, fn):
-        @functools.wraps(fn)
-        def decorated(*args, **kwargs):
-            result = self.run_decorated(fn, *args, **kwargs)
-            return result
-        return decorated
+    def __call__(self, key, group_keys=None, group_key=None):
+        def decorate_func(fn):
+            @functools.wraps(fn)
+            def decorates_args(*args, **kwargs):
+                self.key = key
+                self.group_keys = group_keys or []
+                if group_key:
+                    self.group_keys.append(group_key)
+                result = self.run_decorated(fn, *args, **kwargs)
+                return result
+            return decorates_args
+        return decorate_func
 
 
-    def __init__(self, key, group_keys=None, group_key=None):
-        self.key = key
-        self.group_keys = group_keys or []
-        if group_key:
-            self.group_keys.append(group_key)
+    def __init__(self, cache_client):
+        self.cache = cache_client
+
+    def expire_key(self, key):
+        self.cache.set(make_key(key), None)
 
     def run_decorated(self, func, *args, **kwargs):
-        key = make_key(self.key)
+        key = make_key(self.key, repr(func), args, kwargs)
         group_keys = map(make_key, self.group_keys)
+        cache = self.cache
         value = None
         evaluate = False
         if group_keys:
@@ -98,3 +103,8 @@ class cached(object):
                 group_dict[key] = data_dict
                 cache.set_many(group_dict)
         return value
+
+
+def cached_factory(client):
+    return CacheDecorator(client)
+

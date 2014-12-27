@@ -4,19 +4,39 @@
 from factories import cached_factory
 
 import unittest
-from hash_ring import MemcacheRing
+# from hash_ring import MemcacheRing
+from memcache import Client
 
 class Basic(unittest.TestCase):
 
     def setUp(self):
-        mc = MemcacheRing(['127.0.0.1:11212'])
+        mc = Client(['0.0.0.0:11211'])
         self.cache_decorator = cached_factory(mc)
 
-    def test_decoration(self):
+    def test_simple(self):
+        cache = self.cache_decorator
+        self.call_count = 0
 
-        cached = self.cache_decorator
-
-        @cached
+        @cache("simple")
         def func():
+            self.call_count += 1
             return 1
+
+        cache.expire_key("simple")
+        self.assertEqual(func(), 1)
+        self.assertEqual(func(), 1)
+        self.assertEqual(self.call_count, 1)
+
+    def test_params(self):
+        cache = self.cache_decorator
+
+        @cache("test_params")
+        def func(argument):
+            return argument
+
+        self.assertEqual(func(1), 1)
+        self.assertEqual(func(2), 2)
+
+
+
 
