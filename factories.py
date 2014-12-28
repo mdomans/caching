@@ -40,7 +40,7 @@ class CacheDecorator(object):
     """
     group_keys = []
 
-    def __call__(self, key, group_keys=None, group_key=None):
+    def __call__(self, key=None, group_keys=None, group_key=None):
         def decorate_func(fn):
             @functools.wraps(fn)
             def decorates_args(*args, **kwargs):
@@ -64,7 +64,10 @@ class CacheDecorator(object):
         self.cache.set(make_key(key), None)
 
     def run_decorated(self, func, *args, **kwargs):
-        key = make_key(self.key, repr(func), args, kwargs)
+        if self.key:
+            key = make_key(self.key)
+        else:
+            key = make_key(repr(func), repr(args), repr(kwargs))
         group_keys = map(make_key, self.group_keys)
         cache = self.cache
         value = None
