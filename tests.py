@@ -5,7 +5,6 @@ from factories import cached_factory
 
 import unittest
 from memcache import Client
-from ultramemcache import Client as UClient
 
 
 class TestMemcacheClient(unittest.TestCase):
